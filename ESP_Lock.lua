@@ -5,35 +5,45 @@ local connections = {}
 
 local plots = workspace:WaitForChild("Plots")
 
--- bikin billboard besar dan sync text
-local function createBigBillboard(originalLabel)
+-- bikin billboard besar dan sync text (TIDAK HAPUS, CUKUP BUAT SEKALI)
+local function createBigBillboard(originalLabel, modelId)
 	local main = originalLabel:FindFirstAncestor("Main")
 	if not main then return end
 
-	-- hapus lama
-	local old = main:FindFirstChild("RemainingTime_Big")
-	if old then old:Destroy() end
+	-- cari clone lama berdasarkan nama model (biar unik per model)
+	local cloneName = "RemainingTime_Big_" .. modelId
+	local cloneBillboard = main:FindFirstChild(cloneName)
 
-	-- buat clone Billboard
-	local cloneBillboard = Instance.new("BillboardGui")
-	cloneBillboard.Name = "RemainingTime_Big"
-	cloneBillboard.AlwaysOnTop = true
-	cloneBillboard.Size = UDim2.new(0, 100, 0, 35)
-	cloneBillboard.StudsOffset = Vector3.new(0, 2, 0)
-	cloneBillboard.MaxDistance = 1500
-	cloneBillboard.Parent = main
+	-- kalau belum ada clone → buat
+	if not cloneBillboard then
+		cloneBillboard = Instance.new("BillboardGui")
+		cloneBillboard.Name = cloneName
+		cloneBillboard.AlwaysOnTop = true
+		cloneBillboard.Size = UDim2.new(0, 100, 0, 35)
+		cloneBillboard.StudsOffset = Vector3.new(0, 2, 0)
+		cloneBillboard.MaxDistance = 1500
+		cloneBillboard.Parent = main
 
-	-- label clone
-	local cloneLabel = Instance.new("TextLabel")
-	cloneLabel.Size = UDim2.new(1, 0, 1, 0)
-	cloneLabel.BackgroundTransparency = 1
-	cloneLabel.TextColor3 = originalLabel.TextColor3
-	cloneLabel.TextScaled = true
-	cloneLabel.Font = originalLabel.Font
-	cloneLabel.TextStrokeTransparency = 0
-	cloneLabel.Parent = cloneBillboard
+		-- label clone
+		local cloneLabel = Instance.new("TextLabel")
+		cloneLabel.Name = "Label"
+		cloneLabel.Size = UDim2.new(1, 0, 1, 0)
+		cloneLabel.BackgroundTransparency = 1
+		cloneLabel.TextColor3 = originalLabel.TextColor3
+		cloneLabel.TextScaled = true
+		cloneLabel.Font = originalLabel.Font
+		cloneLabel.TextStrokeTransparency = 0
+		cloneLabel.Parent = cloneBillboard
 
-	-- sinkron teks
+		-- simpan agar bisa dibersihkan
+		table.insert(connections, cloneBillboard)
+	end
+
+	-- ambil label clone (selalu ada sekarang)
+	local cloneLabel = cloneBillboard:FindFirstChild("Label")
+	if not cloneLabel then return end
+
+	-- fungsi sync text
 	local function sync()
 		if originalLabel and originalLabel.Parent then
 			cloneLabel.Text = originalLabel.Text
@@ -41,15 +51,31 @@ local function createBigBillboard(originalLabel)
 	end
 	sync()
 
+	-- koneksi perubahan teks
 	local textConn = originalLabel:GetPropertyChangedSignal("Text"):Connect(sync)
-
-	-- simpan biar bisa dibersihkan saat disable
 	table.insert(connections, textConn)
-	table.insert(connections, cloneBillboard)
+end
+
+-- pasang listener buat BillboardGui dalam 1 model
+local function setupBillboard(billboard, modelId)
+	local rt = billboard:FindFirstChild("RemainingTime")
+	if rt and rt:IsA("TextLabel") then
+		createBigBillboard(rt, modelId)
+	end
+
+	-- kalau RemainingTime baru ditambah belakangan
+	local conn = billboard.ChildAdded:Connect(function(child)
+		if child.Name == "RemainingTime" and child:IsA("TextLabel") then
+			createBigBillboard(child, modelId)
+		end
+	end)
+	table.insert(connections, conn)
 end
 
 -- pasang listener buat 1 model
 local function watchModel(model)
+	local modelId = model.Name -- pakai nama model sebagai ID unik
+
 	local purchases = model:FindFirstChild("Purchases")
 	if not purchases then return end
 	local plotBlock = purchases:FindFirstChild("PlotBlock")
@@ -57,20 +83,20 @@ local function watchModel(model)
 	local main = plotBlock:FindFirstChild("Main")
 	if not main then return end
 
-	if main:FindFirstChild("BillboardGui") then
-		local rt = main.BillboardGui:FindFirstChild("RemainingTime")
-		if rt then
-			createBigBillboard(rt)
+	-- cek semua BillboardGui yang ada sekarang
+	for _, child in ipairs(main:GetChildren()) do
+		if child:IsA("BillboardGui") then
+			setupBillboard(child, modelId)
 		end
-
-		-- pantau kalau RemainingTime ditambah belakangan
-		local conn = main.BillboardGui.ChildAdded:Connect(function(child)
-			if child.Name == "RemainingTime" and child:IsA("TextLabel") then
-				createBigBillboard(child)
-			end
-		end)
-		table.insert(connections, conn)
 	end
+
+	-- pantau kalau BillboardGui baru muncul belakangan
+	local conn = main.ChildAdded:Connect(function(child)
+		if child:IsA("BillboardGui") then
+			setupBillboard(child, modelId)
+		end
+	end)
+	table.insert(connections, conn)
 end
 
 -- ========== PUBLIC FUNCTIONS ==========
@@ -78,7 +104,7 @@ function ESPLock:Enable()
 	if active then return end
 	active = true
 
-	-- scan semua plot
+	-- scan semua plot (total 8 model)
 	for _, model in pairs(plots:GetChildren()) do
 		if model:IsA("Model") then
 			watchModel(model)
@@ -88,7 +114,7 @@ function ESPLock:Enable()
 	-- pantau plot baru
 	local conn1 = plots.ChildAdded:Connect(function(model)
 		if model:IsA("Model") then
-			task.wait(1)
+			task.wait(1) -- kasih delay biar child sudah kebentuk
 			watchModel(model)
 		end
 	end)
@@ -103,9 +129,8 @@ function ESPLock:Disable()
 	for _, c in ipairs(connections) do
 		if typeof(c) == "RBXScriptConnection" then
 			c:Disconnect()
-		elseif typeof(c) == "Instance" and c:IsA("BillboardGui") then
-			c:Destroy()
 		end
+		-- billboard clone TIDAK dihapus → tetap ada meski disable
 	end
 	connections = {}
 end

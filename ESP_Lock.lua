@@ -18,7 +18,7 @@ local function createBigBillboard(originalLabel)
 	local cloneBillboard = Instance.new("BillboardGui")
 	cloneBillboard.Name = "RemainingTime_Big"
 	cloneBillboard.AlwaysOnTop = true
-	cloneBillboard.Size = UDim2.new(0, 100, 0, 50)
+	cloneBillboard.Size = UDim2.new(0, 100, 0, 35)
 	cloneBillboard.StudsOffset = Vector3.new(0, 2, 0)
 	cloneBillboard.MaxDistance = 1500
 	cloneBillboard.Parent = main

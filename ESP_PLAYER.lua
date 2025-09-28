@@ -27,7 +27,7 @@ function ESP:Add(plr)
 
     -- Highlight
     local hl = Instance.new("Highlight")
-    hl.FillTransparency = 0.7
+    hl.FillTransparency = 0.5
     hl.OutlineColor = Color3.fromRGB(255, 50, 50)
     hl.Parent = char
 

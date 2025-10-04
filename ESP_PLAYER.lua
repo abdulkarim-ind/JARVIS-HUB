@@ -2,31 +2,32 @@
 local ESP = {}
 local active = false
 local connections = {}
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
 
 -- Tambah ESP ke player
 function ESP:Add(plr)
-    if plr == game.Players.LocalPlayer then return end
+    if plr == LocalPlayer then return end
 
     local function applyESP(char)
         local head = char:WaitForChild("Head", 5)
         if not head then return end
 
-        -- Billboard
+        -- Billboard GUI
         local gui = Instance.new("BillboardGui")
         gui.AlwaysOnTop = true
-        gui.Size = UDim2.new(0, 100, 0, 20)
-        gui.StudsOffset = Vector3.new(0, 2, 0)
+        gui.Size = UDim2.new(0, 150, 0, 30)
+        gui.StudsOffset = Vector3.new(0, 2.5, 0)
         gui.Name = "ESP_Billboard"
         gui.Parent = head
 
         local txt = Instance.new("TextLabel")
         txt.Size = UDim2.new(1, 0, 1, 0)
         txt.BackgroundTransparency = 1
-        txt.Text = plr.Name
         txt.TextColor3 = Color3.fromRGB(255, 50, 50)
         txt.TextScaled = true
         txt.TextStrokeTransparency = 0
-        txt.Font = Enum.Font.SourceSansBold
+        txt.Font = Enum.Font.GothamBold
         txt.Parent = gui
 
         -- Highlight
@@ -36,21 +37,38 @@ function ESP:Add(plr)
         hl.Name = "ESP_Highlight"
         hl.Parent = char
 
+        -- Update teks dengan jarak
+        task.spawn(function()
+            while gui.Parent and active do
+                task.wait(0.2)
+                local myChar = LocalPlayer.Character
+                if myChar and myChar:FindFirstChild("HumanoidRootPart") and char:FindFirstChild("HumanoidRootPart") then
+                    local dist = (myChar.HumanoidRootPart.Position - char.HumanoidRootPart.Position).Magnitude
+                    txt.Text = string.format("%s\n[%.0f studs]", plr.DisplayName, dist)
+                else
+                    txt.Text = plr.DisplayName
+                end
+            end
+            if gui and gui.Parent then
+                gui:Destroy()
+            end
+        end)
+
         -- Simpan referensi
         connections[plr] = connections[plr] or {}
         table.insert(connections[plr], gui)
         table.insert(connections[plr], hl)
     end
 
-    -- Kalau sudah ada char
+    -- Kalau sudah ada character
     if plr.Character then
         applyESP(plr.Character)
     end
 
-    -- Tambahin listener supaya respawn juga dapet ESP
+    -- Listener kalau respawn
     local charAddedConn = plr.CharacterAdded:Connect(function(char)
         if active then
-            task.wait(1) -- delay dikit biar Head & body kebentuk
+            task.wait(1)
             applyESP(char)
         end
     end)
@@ -78,16 +96,17 @@ end
 function ESP:Enable()
     if active then return end
     active = true
-    for _, plr in ipairs(game.Players:GetPlayers()) do
+
+    for _, plr in ipairs(Players:GetPlayers()) do
         ESP:Add(plr)
     end
 
-    -- Kalau ada player join setelah ESP aktif
-    connections["_PlayerAdded"] = game.Players.PlayerAdded:Connect(function(plr)
+    -- Player join/leave handler
+    connections["_PlayerAdded"] = Players.PlayerAdded:Connect(function(plr)
         ESP:Add(plr)
     end)
 
-    connections["_PlayerRemoving"] = game.Players.PlayerRemoving:Connect(function(plr)
+    connections["_PlayerRemoving"] = Players.PlayerRemoving:Connect(function(plr)
         ESP:Remove(plr)
     end)
 end

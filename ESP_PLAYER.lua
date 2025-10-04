@@ -114,8 +114,21 @@ end
 -- Nonaktifkan ESP
 function ESP:Disable()
     active = false
-    for plr, _ in pairs(connections) do
-        ESP:Remove(plr)
+    -- Hapus ESP dari setiap player
+    for plr, objs in pairs(connections) do
+        if typeof(plr) == "Instance" and plr:IsA("Player") then
+            ESP:Remove(plr)
+        end
+    end
+
+    -- Putuskan event global
+    if connections["_PlayerAdded"] then
+        connections["_PlayerAdded"]:Disconnect()
+        connections["_PlayerAdded"] = nil
+    end
+    if connections["_PlayerRemoving"] then
+        connections["_PlayerRemoving"]:Disconnect()
+        connections["_PlayerRemoving"] = nil
     end
 end
 

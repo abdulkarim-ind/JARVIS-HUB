@@ -36,12 +36,9 @@ local Window = Library:CreateWindow({
 
 -- You do not have to set your tabs & groups up this way, just a prefrence.
 -- You can find more icons in https://lucide.dev/
---local Tabs = {
-	-- Creates a new tab titled Main
---	Main = Window:AddTab("Main", "user"),
---	Key = Window:AddKeyTab("Key System"),
---	["UI Settings"] = Window:AddTab("UI Settings", "settings"),
---}
+local Tabs = {
+	["UI Settings"] = Window:AddTab("UI Settings", "settings"),
+}
 
 
 --[[

@@ -36,13 +36,13 @@ local Window = Library:CreateWindow({
 
 -- You do not have to set your tabs & groups up this way, just a prefrence.
 -- You can find more icons in https://lucide.dev/
---[[local Tabs = {
+--local Tabs = {
 	-- Creates a new tab titled Main
-	Main = Window:AddTab("Main", "user"),
-	Key = Window:AddKeyTab("Key System"),
-	["UI Settings"] = Window:AddTab("UI Settings", "settings"),
-}
-]]
+--	Main = Window:AddTab("Main", "user"),
+--	Key = Window:AddKeyTab("Key System"),
+--	["UI Settings"] = Window:AddTab("UI Settings", "settings"),
+--}
+
 
 --[[
 Example of how to add a warning box to a tab; the title AND text support rich text formatting.

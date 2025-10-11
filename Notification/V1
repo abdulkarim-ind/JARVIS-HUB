@@ -1,20 +1,20 @@
---// 🧩 NotifyLib (One-Call Notification Library)
+--// 🧩 NotifyLib (Fluent-style Notification Library)
 -- Author: xeAtheo
--- Simple notification system with fade, sound, and stacking support
+-- Simple, stackable notifications with fade + optional sound
 
 local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
--- Pastikan ScreenGui utama ada
+-- Pastikan GUI utama hanya 1x
 local ScreenGui = playerGui:FindFirstChild("JARVIS_NotifyGui") or Instance.new("ScreenGui")
 ScreenGui.Name = "JARVIS_NotifyGui"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.IgnoreGuiInset = true
 ScreenGui.Parent = playerGui
 
--- Holder untuk stacking
+-- Holder untuk stacking ke atas
 local Holder = ScreenGui:FindFirstChild("NotifyHolder") or Instance.new("Frame")
 Holder.Name = "NotifyHolder"
 Holder.AnchorPoint = Vector2.new(1, 1)
@@ -29,9 +29,14 @@ UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
 UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
 UIListLayout.Parent = Holder
 
--- Fungsi utama (library return)
-local function NotifyLib(title, content, duration, sound)
+--[[ 🔔 Fungsi utama ]]
+local function Notify(settings)
 	task.spawn(function()
+		local title = settings.Title or "Notification"
+		local content = settings.Content or ""
+		local duration = settings.Duration or 3
+		local sound = settings.Sound
+
 		local notif = Instance.new("Frame")
 		notif.Size = UDim2.new(1, -10, 0, 80)
 		notif.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
@@ -47,7 +52,7 @@ local function NotifyLib(title, content, duration, sound)
 		titleLabel.Size = UDim2.new(1, -20, 0, 25)
 		titleLabel.Position = UDim2.new(0, 10, 0, 5)
 		titleLabel.BackgroundTransparency = 1
-		titleLabel.Text = title or "Notification"
+		titleLabel.Text = title
 		titleLabel.TextColor3 = Color3.fromRGB(255, 200, 50)
 		titleLabel.TextSize = 14
 		titleLabel.Font = Enum.Font.GothamBold
@@ -58,7 +63,7 @@ local function NotifyLib(title, content, duration, sound)
 		contentLabel.Size = UDim2.new(1, -20, 1, -35)
 		contentLabel.Position = UDim2.new(0, 10, 0, 30)
 		contentLabel.BackgroundTransparency = 1
-		contentLabel.Text = content or ""
+		contentLabel.Text = content
 		contentLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 		contentLabel.TextSize = 12
 		contentLabel.Font = Enum.Font.Gotham
@@ -67,22 +72,22 @@ local function NotifyLib(title, content, duration, sound)
 		contentLabel.TextWrapped = true
 		contentLabel.Parent = notif
 
-		-- 🌀 Fade In
+		-- 🌀 Fade In Animation
 		TweenService:Create(notif, TweenInfo.new(0.25, Enum.EasingStyle.Quad), {BackgroundTransparency = 0}):Play()
 
-		-- 🔊 Optional sound
+		-- 🔊 Optional Sound
 		if sound then
 			local s = Instance.new("Sound")
-			s.SoundId = "rbxassetid://4590657391"
+			s.SoundId = "rbxassetid://4590657391" -- ding
 			s.Volume = 1
 			s.PlayOnRemove = true
 			s.Parent = notif
-			s:Destroy() -- auto play
+			s:Destroy() -- instantly plays
 		end
 
-		task.wait(duration or 3)
+		task.wait(duration)
 
-		-- 🌀 Fade Out
+		-- 🌀 Fade Out Animation
 		local fadeOut = TweenService:Create(notif, TweenInfo.new(0.25, Enum.EasingStyle.Quad), {BackgroundTransparency = 1})
 		fadeOut:Play()
 		fadeOut.Completed:Wait()
@@ -91,4 +96,4 @@ local function NotifyLib(title, content, duration, sound)
 	end)
 end
 
-return NotifyLib
+return Notify

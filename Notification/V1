@@ -78,7 +78,7 @@ local function Notify(settings)
 		-- 🔊 Optional Sound
 		if sound then
 			local s = Instance.new("Sound")
-			s.SoundId = "rbxassetid://4590657391" -- ding
+			s.SoundId = "rbxassetid://17208361335" -- ding
 			s.Volume = 1
 			s.PlayOnRemove = true
 			s.Parent = notif

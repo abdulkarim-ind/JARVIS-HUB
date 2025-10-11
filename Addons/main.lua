@@ -1,532 +1,468 @@
---[[
-    Universal UI Library - Example Script
-    Contoh penggunaan semua fitur yang tersedia
-]]
+-- ═══════════════════════════════════════════════════════
+-- 🎨 PIAN HUB UI Library v2.0
+-- Modern & Clean UI Components
+-- ═══════════════════════════════════════════════════════
 
--- Load Library
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/your-repo/UniversalUI.lua"))()
+local UILib = {}
+UILib.__index = UILib
 
--- Create Window
-local Window = Library:CreateWindow({
-    Name = "Universal Hub",
-    ThemePrimary = Color3.fromRGB(45, 45, 45),
-    ThemeSecondary = Color3.fromRGB(35, 35, 35),
-    ThemeAccent = Color3.fromRGB(0, 170, 255),
-    ConfigFolder = "UniversalConfigs"
-})
+-- ═══ SERVICES ═══
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local CoreGui = game:GetService("CoreGui")
 
--- Tab 1: Main Features
-local MainTab = Window:CreateTab("Main")
-
-MainTab:AddLabel("⭐ Welcome to Universal UI Library!")
-
-MainTab:AddButton({
-    Name = "Click Me!",
-    Callback = function()
-        print("Button clicked!")
-    end
-})
-
-local toggle1 = MainTab:AddToggle({
-    Name = "Enable Feature",
-    Default = false,
-    Flag = "MainToggle",
-    Callback = function(value)
-        print("Toggle:", value)
-    end
-})
-
-local slider1 = MainTab:AddSlider({
-    Name = "Walk Speed",
-    Min = 16,
-    Max = 200,
-    Default = 16,
-    Increment = 1,
-    Flag = "WalkSpeed",
-    Callback = function(value)
-        print("Slider value:", value)
-        -- game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
-    end
-})
-
-local dropdown1 = MainTab:AddDropdown({
-    Name = "Select Weapon",
-    Options = {"Sword", "Gun", "Bow", "Staff", "Axe"},
-    Default = "Sword",
-    Flag = "Weapon",
-    Callback = function(value)
-        print("Selected weapon:", value)
-    end
-})
-
--- Tab 2: Advanced
-local AdvancedTab = Window:CreateTab("Advanced")
-
-AdvancedTab:AddLabel("🔧 Advanced Settings")
-
-local multiDropdown = AdvancedTab:AddMultiDropdown({
-    Name = "Select Players",
-    Options = {"Player1", "Player2", "Player3", "Player4", "Player5"},
-    Default = {"Player1"},
-    Flag = "SelectedPlayers",
-    Callback = function(values)
-        print("Selected players:")
-        for player, enabled in pairs(values) do
-            if enabled then
-                print("-", player)
-            end
-        end
-    end
-})
-
-local textbox1 = AdvancedTab:AddTextBox({
-    Name = "Enter Message",
-    Placeholder = "Type something...",
-    Default = "",
-    Flag = "Message",
-    Callback = function(text)
-        print("Text entered:", text)
-    end
-})
-
-local colorPicker1 = AdvancedTab:AddColorPicker({
-    Name = "Choose Color",
-    Default = Color3.fromRGB(255, 0, 0),
-    Flag = "PlayerColor",
-    Callback = function(color)
-        print("Color selected:", color)
-    end
-})
-
-AdvancedTab:AddButton({
-    Name = "Refresh Dropdown",
-    Callback = function()
-        dropdown1:Refresh({"Knife", "Pistol", "Rifle", "Shotgun"})
-        print("Dropdown refreshed!")
-    end
-})
-
--- Tab 3: Animations (R6)
-local AnimTab = Window:CreateTab("Animation")
-
-AnimTab:AddLabel("🎭 R6 Animations")
-
-AnimTab:AddButton({
-    Name = "Winged Master Dance",
-    Callback = function()
-        -- Load animation
-        local player = game.Players.LocalPlayer
-        local character = player.Character or player.CharacterAdded:Wait()
-        local humanoid = character:WaitForChild("Humanoid")
-        
-        local animationId = "rbxassetid://YOUR_ANIMATION_ID"
-        local animation = Instance.new("Animation")
-        animation.AnimationId = animationId
-        
-        local animator = humanoid:FindFirstChild("Animator")
-        if not animator then
-            animator = Instance.new("Animator")
-            animator.Parent = humanoid
-        end
-        
-        local animTrack = animator:LoadAnimation(animation)
-        animTrack:Play()
-        
-        print("Playing Winged Master animation")
-    end
-})
-
-AnimTab:AddButton({
-    Name = "Da Feets Dance",
-    Callback = function()
-        print("Playing Da Feets animation")
-    end
-})
-
-AnimTab:AddButton({
-    Name = "Human Car",
-    Callback = function()
-        print("Playing Human Car animation")
-    end
-})
-
-AnimTab:AddButton({
-    Name = "Rickroll Dance",
-    Callback = function()
-        print("Playing Rickroll animation")
-    end
-})
-
-AnimTab:AddToggle({
-    Name = "Loop Animation",
-    Default = false,
-    Flag = "LoopAnim",
-    Callback = function(value)
-        print("Loop animation:", value)
-    end
-})
-
--- Tab 4: Player Settings
-local PlayerTab = Window:CreateTab("Player")
-
-PlayerTab:AddLabel("👤 Player Settings")
-
-PlayerTab:AddSlider({
-    Name = "Jump Power",
-    Min = 50,
-    Max = 200,
-    Default = 50,
-    Increment = 5,
-    Flag = "JumpPower",
-    Callback = function(value)
-        print("Jump power:", value)
-        -- game.Players.LocalPlayer.Character.Humanoid.JumpPower = value
-    end
-})
-
-PlayerTab:AddSlider({
-    Name = "Gravity",
-    Min = 0,
-    Max = 196,
-    Default = 196,
-    Increment = 1,
-    Flag = "Gravity",
-    Callback = function(value)
-        print("Gravity:", value)
-        -- game.Workspace.Gravity = value
-    end
-})
-
-PlayerTab:AddToggle({
-    Name = "Infinite Jump",
-    Default = false,
-    Flag = "InfJump",
-    Callback = function(value)
-        print("Infinite jump:", value)
-    end
-})
-
-PlayerTab:AddToggle({
-    Name = "No Clip",
-    Default = false,
-    Flag = "NoClip",
-    Callback = function(value)
-        print("No clip:", value)
-    end
-})
-
-PlayerTab:AddButton({
-    Name = "Reset Character",
-    Callback = function()
-        game.Players.LocalPlayer.Character:BreakJoints()
-    end
-})
-
--- Tab 5: Teleport
-local TeleportTab = Window:CreateTab("Teleport")
-
-TeleportTab:AddLabel("📍 Teleport Locations")
-
-local locations = {
-    ["Spawn"] = Vector3.new(0, 5, 0),
-    ["Shop"] = Vector3.new(100, 5, 100),
-    ["Arena"] = Vector3.new(-100, 5, -100),
-    ["Secret Area"] = Vector3.new(200, 50, 200)
-}
-
-for name, position in pairs(locations) do
-    TeleportTab:AddButton({
-        Name = "TP to " .. name,
-        Callback = function()
-            local player = game.Players.LocalPlayer
-            if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                player.Character.HumanoidRootPart.CFrame = CFrame.new(position)
-                print("Teleported to " .. name)
-            end
-        end
-    })
+-- ═══ UTILITY FUNCTIONS ═══
+local function tween(obj, props, duration)
+    TweenService:Create(obj, TweenInfo.new(duration or 0.3, Enum.EasingStyle.Quad), props):Play()
 end
 
-TeleportTab:AddToggle({
-    Name = "Auto Farm Location",
-    Default = false,
-    Flag = "AutoFarm",
-    Callback = function(value)
-        print("Auto farm:", value)
-        -- Add auto farm logic here
+local function addCorner(obj, radius)
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, radius or 8)
+    corner.Parent = obj
+    return corner
+end
+
+local function addStroke(obj, color, thickness)
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = color or Color3.fromRGB(60, 60, 70)
+    stroke.Thickness = thickness or 1
+    stroke.Parent = obj
+    return stroke
+end
+
+-- ═══ CREATE WINDOW ═══
+function UILib:CreateWindow(title)
+    local window = {}
+    
+    -- Clean old UI
+    if CoreGui:FindFirstChild("PianHubUI") then
+        CoreGui:FindFirstChild("PianHubUI"):Destroy()
     end
-})
-
--- Tab 6: Misc
-local MiscTab = Window:CreateTab("Misc")
-
-MiscTab:AddLabel("🔧 Miscellaneous Settings")
-
-MiscTab:AddToggle({
-    Name = "Full Bright",
-    Default = false,
-    Flag = "FullBright",
-    Callback = function(value)
-        print("Full bright:", value)
-        if value then
-            game.Lighting.Brightness = 2
-            game.Lighting.ClockTime = 14
-            game.Lighting.FogEnd = 100000
-            game.Lighting.GlobalShadows = false
-            game.Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
-        else
-            game.Lighting.Brightness = 1
-            game.Lighting.ClockTime = 12
-            game.Lighting.FogEnd = 100000
-            game.Lighting.GlobalShadows = true
-            game.Lighting.OutdoorAmbient = Color3.fromRGB(70, 70, 70)
+    
+    -- ScreenGui
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "PianHubUI"
+    ScreenGui.ResetOnSpawn = false
+    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    ScreenGui.Parent = CoreGui
+    
+    -- Main Frame
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Name = "MainFrame"
+    MainFrame.Size = UDim2.new(0, 480, 0, 520)
+    MainFrame.Position = UDim2.new(0.5, -240, 0.5, -260)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+    MainFrame.BorderSizePixel = 0
+    MainFrame.Active = true
+    MainFrame.Draggable = true
+    MainFrame.Parent = ScreenGui
+    addCorner(MainFrame, 12)
+    addStroke(MainFrame, Color3.fromRGB(60, 60, 75), 2)
+    
+    -- Shadow Effect
+    local Shadow = Instance.new("ImageLabel")
+    Shadow.Name = "Shadow"
+    Shadow.BackgroundTransparency = 1
+    Shadow.Position = UDim2.new(0, -15, 0, -15)
+    Shadow.Size = UDim2.new(1, 30, 1, 30)
+    Shadow.ZIndex = 0
+    Shadow.Image = "rbxasset://textures/ui/Shadow.png"
+    Shadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+    Shadow.ImageTransparency = 0.5
+    Shadow.ScaleType = Enum.ScaleType.Slice
+    Shadow.SliceCenter = Rect.new(10, 10, 118, 118)
+    Shadow.Parent = MainFrame
+    
+    -- Title Bar
+    local TitleBar = Instance.new("Frame")
+    TitleBar.Name = "TitleBar"
+    TitleBar.Size = UDim2.new(1, 0, 0, 50)
+    TitleBar.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+    TitleBar.BorderSizePixel = 0
+    TitleBar.Parent = MainFrame
+    addCorner(TitleBar, 12)
+    
+    -- Title Bottom Fix
+    local TitleFix = Instance.new("Frame")
+    TitleFix.Size = UDim2.new(1, 0, 0, 12)
+    TitleFix.Position = UDim2.new(0, 0, 1, -12)
+    TitleFix.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+    TitleFix.BorderSizePixel = 0
+    TitleFix.Parent = TitleBar
+    
+    -- Title Icon
+    local TitleIcon = Instance.new("TextLabel")
+    TitleIcon.Size = UDim2.new(0, 35, 0, 35)
+    TitleIcon.Position = UDim2.new(0, 10, 0, 7)
+    TitleIcon.BackgroundTransparency = 1
+    TitleIcon.Text = "🧩"
+    TitleIcon.TextSize = 24
+    TitleIcon.Parent = TitleBar
+    
+    -- Title Text
+    local Title = Instance.new("TextLabel")
+    Title.Size = UDim2.new(1, -140, 1, 0)
+    Title.Position = UDim2.new(0, 50, 0, 0)
+    Title.BackgroundTransparency = 1
+    Title.Text = title or "PIAN HUB"
+    Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Title.TextSize = 18
+    Title.Font = Enum.Font.GothamBold
+    Title.TextXAlignment = Enum.TextXAlignment.Left
+    Title.Parent = TitleBar
+    
+    -- Version Label
+    local Version = Instance.new("TextLabel")
+    Version.Size = UDim2.new(0, 60, 0, 20)
+    Version.Position = UDim2.new(0, 50, 0, 25)
+    Version.BackgroundTransparency = 1
+    Version.Text = "v2.0"
+    Version.TextColor3 = Color3.fromRGB(150, 150, 160)
+    Version.TextSize = 11
+    Version.Font = Enum.Font.Gotham
+    Version.TextXAlignment = Enum.TextXAlignment.Left
+    Version.Parent = TitleBar
+    
+    -- Button Helper
+    local function createTitleButton(pos, color, text, icon)
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(0, 35, 0, 35)
+        btn.Position = pos
+        btn.BackgroundColor3 = color
+        btn.Text = icon or text
+        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        btn.TextSize = 16
+        btn.Font = Enum.Font.GothamBold
+        btn.BorderSizePixel = 0
+        btn.Parent = TitleBar
+        addCorner(btn, 8)
+        
+        btn.MouseEnter:Connect(function()
+            tween(btn, {BackgroundColor3 = Color3.new(color.R + 0.1, color.G + 0.1, color.B + 0.1)}, 0.2)
+        end)
+        btn.MouseLeave:Connect(function()
+            tween(btn, {BackgroundColor3 = color}, 0.2)
+        end)
+        
+        return btn
+    end
+    
+    local MinimizeBtn = createTitleButton(UDim2.new(1, -80, 0, 7), Color3.fromRGB(50, 50, 60), "-", "─")
+    local CloseBtn = createTitleButton(UDim2.new(1, -40, 0, 7), Color3.fromRGB(200, 50, 60), "✕", "✕")
+    
+    -- Floating Icon (saat minimize)
+    local FloatingIcon = Instance.new("ImageButton")
+    FloatingIcon.Name = "FloatingIcon"
+    FloatingIcon.Size = UDim2.new(0, 50, 0, 50)
+    FloatingIcon.Position = UDim2.new(0, 20, 0, 100)
+    FloatingIcon.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+    FloatingIcon.BorderSizePixel = 0
+    FloatingIcon.Visible = false
+    FloatingIcon.Active = true
+    FloatingIcon.Draggable = true
+    FloatingIcon.Parent = ScreenGui
+    addCorner(FloatingIcon, 25)
+    addStroke(FloatingIcon, Color3.fromRGB(80, 80, 100), 2)
+    
+    local IconLabel = Instance.new("TextLabel")
+    IconLabel.Size = UDim2.new(1, 0, 1, 0)
+    IconLabel.BackgroundTransparency = 1
+    IconLabel.Text = "🧩"
+    IconLabel.TextSize = 28
+    IconLabel.Parent = FloatingIcon
+    
+    -- Tab Bar
+    local TabBar = Instance.new("Frame")
+    TabBar.Size = UDim2.new(1, -20, 0, 40)
+    TabBar.Position = UDim2.new(0, 10, 0, 60)
+    TabBar.BackgroundColor3 = Color3.fromRGB(30, 30, 38)
+    TabBar.BorderSizePixel = 0
+    TabBar.Parent = MainFrame
+    addCorner(TabBar, 8)
+    
+    local TabLayout = Instance.new("UIListLayout")
+    TabLayout.FillDirection = Enum.FillDirection.Horizontal
+    TabLayout.Padding = UDim.new(0, 8)
+    TabLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+    TabLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+    TabLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    TabLayout.Parent = TabBar
+    
+    local TabPadding = Instance.new("UIPadding")
+    TabPadding.PaddingLeft = UDim.new(0, 8)
+    TabPadding.Parent = TabBar
+    
+    -- Divider Line
+    local Divider = Instance.new("Frame")
+    Divider.Size = UDim2.new(1, -20, 0, 1)
+    Divider.Position = UDim2.new(0, 10, 0, 108)
+    Divider.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
+    Divider.BorderSizePixel = 0
+    Divider.Parent = MainFrame
+    
+    -- Content Container
+    local ContentContainer = Instance.new("Frame")
+    ContentContainer.Size = UDim2.new(1, 0, 1, -118)
+    ContentContainer.Position = UDim2.new(0, 0, 0, 118)
+    ContentContainer.BackgroundTransparency = 1
+    ContentContainer.Parent = MainFrame
+    
+    window.ScreenGui = ScreenGui
+    window.MainFrame = MainFrame
+    window.TitleBar = TitleBar
+    window.TabBar = TabBar
+    window.ContentContainer = ContentContainer
+    window.Tabs = {}
+    window.CurrentTab = nil
+    window.MinimizeBtn = MinimizeBtn
+    window.CloseBtn = CloseBtn
+    window.FloatingIcon = FloatingIcon
+    
+    -- Minimize Handler
+    MinimizeBtn.MouseButton1Click:Connect(function()
+        if MainFrame.Visible then
+            MainFrame.Visible = false
+            FloatingIcon.Visible = true
         end
-    end
-})
+    end)
+    
+    FloatingIcon.MouseButton1Click:Connect(function()
+        MainFrame.Visible = true
+        FloatingIcon.Visible = false
+    end)
+    
+    return window
+end
 
-MiscTab:AddToggle({
-    Name = "Remove Fog",
-    Default = false,
-    Flag = "RemoveFog",
-    Callback = function(value)
-        print("Remove fog:", value)
-        if value then
-            game.Lighting.FogEnd = 100000
-        else
-            game.Lighting.FogEnd = 1000
+-- ═══ CREATE TAB ═══
+function UILib:CreateTab(window, name, icon)
+    local tab = {}
+    
+    -- Tab Button
+    local TabButton = Instance.new("TextButton")
+    TabButton.Size = UDim2.new(0, 105, 1, -10)
+    TabButton.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+    TabButton.Text = (icon or "📄") .. " " .. name
+    TabButton.TextColor3 = Color3.fromRGB(180, 180, 190)
+    TabButton.TextSize = 13
+    TabButton.Font = Enum.Font.GothamBold
+    TabButton.BorderSizePixel = 0
+    TabButton.Parent = window.TabBar
+    addCorner(TabButton, 6)
+    
+    -- Content Frame
+    local ContentFrame = Instance.new("ScrollingFrame")
+    ContentFrame.Name = name .. "Content"
+    ContentFrame.Size = UDim2.new(1, -20, 1, -10)
+    ContentFrame.Position = UDim2.new(0, 10, 0, 5)
+    ContentFrame.BackgroundTransparency = 1
+    ContentFrame.BorderSizePixel = 0
+    ContentFrame.ScrollBarThickness = 4
+    ContentFrame.ScrollBarImageColor3 = Color3.fromRGB(80, 80, 100)
+    ContentFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    ContentFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+    ContentFrame.Visible = false
+    ContentFrame.Parent = window.ContentContainer
+    
+    local Layout = Instance.new("UIListLayout")
+    Layout.Padding = UDim.new(0, 10)
+    Layout.SortOrder = Enum.SortOrder.LayoutOrder
+    Layout.Parent = ContentFrame
+    
+    tab.Button = TabButton
+    tab.Content = ContentFrame
+    tab.Layout = Layout
+    
+    -- Tab Click Handler
+    TabButton.MouseButton1Click:Connect(function()
+        for _, t in pairs(window.Tabs) do
+            t.Content.Visible = false
+            t.Button.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+            t.Button.TextColor3 = Color3.fromRGB(180, 180, 190)
         end
+        ContentFrame.Visible = true
+        TabButton.BackgroundColor3 = Color3.fromRGB(60, 60, 75)
+        TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        window.CurrentTab = tab
+    end)
+    
+    window.Tabs[name] = tab
+    
+    -- Auto select first tab
+    if not window.CurrentTab then
+        TabButton.MouseButton1Click:Fire()
     end
-})
-
-MiscTab:AddButton({
-    Name = "Unlock FPS",
-    Callback = function()
-        setfpscap(999)
-        print("FPS unlocked!")
-    end
-})
-
-MiscTab:AddSlider({
-    Name = "FOV",
-    Min = 70,
-    Max = 120,
-    Default = 70,
-    Increment = 1,
-    Flag = "FOV",
-    Callback = function(value)
-        print("FOV:", value)
-        game.Workspace.CurrentCamera.FieldOfView = value
-    end
-})
-
-MiscTab:AddTextBox({
-    Name = "Chat Message",
-    Placeholder = "Enter chat message...",
-    Default = "",
-    Flag = "ChatMsg",
-    Callback = function(text)
-        if text ~= "" then
-            game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(text, "All")
-        end
-    end
-})
-
--- Tab 7: Config
-local ConfigTab = Window:CreateTab("Config")
-
-ConfigTab:AddLabel("💾 Configuration Manager")
-
-local configName = ""
-
-ConfigTab:AddTextBox({
-    Name = "Config Name",
-    Placeholder = "MyConfig",
-    Default = "DefaultConfig",
-    Flag = "ConfigName",
-    Callback = function(text)
-        configName = text
-    end
-})
-
-ConfigTab:AddButton({
-    Name = "Save Config",
-    Callback = function()
-        if configName ~= "" then
-            local success = Window:SaveConfig(configName)
-            if success then
-                print("✅ Config saved: " .. configName)
-            else
-                print("❌ Failed to save config")
-            end
-        else
-            print("⚠️ Please enter a config name")
-        end
-    end
-})
-
-ConfigTab:AddButton({
-    Name = "Load Config",
-    Callback = function()
-        if configName ~= "" then
-            local success = Window:LoadConfig(configName)
-            if success then
-                print("✅ Config loaded: " .. configName)
-                -- Update all UI elements with loaded values
-                toggle1:Set(Window.Flags["MainToggle"] or false)
-                slider1:Set(Window.Flags["WalkSpeed"] or 16)
-                dropdown1:Set(Window.Flags["Weapon"] or "Sword")
-            else
-                print("❌ Failed to load config or config not found")
-            end
-        else
-            print("⚠️ Please enter a config name")
-        end
-    end
-})
-
-ConfigTab:AddButton({
-    Name = "Reset All Settings",
-    Callback = function()
-        Window.Flags = {}
-        print("🔄 All settings reset")
-    end
-})
-
-ConfigTab:AddLabel("")
-ConfigTab:AddLabel("📝 Available Flags:")
-ConfigTab:AddLabel("- MainToggle, WalkSpeed, Weapon")
-ConfigTab:AddLabel("- SelectedPlayers, Message, PlayerColor")
-ConfigTab:AddLabel("- JumpPower, Gravity, InfJump, NoClip")
-ConfigTab:AddLabel("- AutoFarm, FullBright, RemoveFog, FOV")
-
--- Tab 8: Credits
-local CreditsTab = Window:CreateTab("Credits")
-
-CreditsTab:AddLabel("👨‍💻 Universal UI Library v1.0")
-CreditsTab:AddLabel("")
-CreditsTab:AddLabel("Created by: Your Name")
-CreditsTab:AddLabel("Discord: YourDiscord#0000")
-CreditsTab:AddLabel("")
-CreditsTab:AddLabel("Features:")
-CreditsTab:AddLabel("✓ Modern UI Design")
-CreditsTab:AddLabel("✓ Smooth Animations")
-CreditsTab:AddLabel("✓ Config System")
-CreditsTab:AddLabel("✓ Multiple Element Types")
-CreditsTab:AddLabel("✓ Minimize/Maximize")
-CreditsTab:AddLabel("✓ Easy to Use")
-CreditsTab:AddLabel("")
-CreditsTab:AddLabel("Thanks for using!")
-
-CreditsTab:AddButton({
-    Name = "Copy Discord",
-    Callback = function()
-        setclipboard("YourDiscord#0000")
-        print("Discord copied to clipboard!")
-    end
-})
-
-CreditsTab:AddButton({
-    Name = "Join Discord Server",
-    Callback = function()
-        print("Opening Discord invite...")
-        -- You can use syn.request or http request to open URL
-    end
-})
-
--- Demo Auto Updates
-print("Universal UI Library loaded successfully!")
-print("Total Tabs:", #Window.Tabs)
-print("Total Flags:", #Window.Flags)
-
--- Example of programmatically changing values
-task.spawn(function()
-    wait(2)
-    print("\n🎯 Demonstrating programmatic control:")
     
-    wait(1)
-    print("Setting toggle to true...")
-    toggle1:Set(true)
-    
-    wait(1)
-    print("Setting slider to 100...")
-    slider1:Set(100)
-    
-    wait(1)
-    print("Setting dropdown to 'Bow'...")
-    dropdown1:Set("Bow")
-    
-    wait(1)
-    print("Setting multi-dropdown...")
-    multiDropdown:Set({"Player2", "Player3"})
-    
-    print("\n✅ Demo complete!")
-end)
+    return tab
+end
 
--- Anti-AFK (Bonus feature)
-local VirtualUser = game:GetService("VirtualUser")
-game:GetService("Players").LocalPlayer.Idled:Connect(function()
-    VirtualUser:CaptureController()
-    VirtualUser:ClickButton2(Vector2.new())
-end)
+-- ═══ CREATE SECTION ═══
+function UILib:CreateSection(tab, title)
+    local Section = Instance.new("Frame")
+    Section.Size = UDim2.new(1, 0, 0, 35)
+    Section.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+    Section.BorderSizePixel = 0
+    Section.Parent = tab.Content
+    addCorner(Section, 8)
+    
+    local Label = Instance.new("TextLabel")
+    Label.Size = UDim2.new(1, -20, 1, 0)
+    Label.Position = UDim2.new(0, 10, 0, 0)
+    Label.BackgroundTransparency = 1
+    Label.Text = "═══ " .. title .. " ═══"
+    Label.TextColor3 = Color3.fromRGB(150, 200, 255)
+    Label.TextSize = 14
+    Label.Font = Enum.Font.GothamBold
+    Label.TextXAlignment = Enum.TextXAlignment.Center
+    Label.Parent = Section
+    
+    return Section
+end
 
-print("\n🛡️ Anti-AFK enabled")
-print("Press the minimize button (-) to hide the UI")
-print("Click the round button (+) to show it again")
+-- ═══ CREATE TOGGLE ═══
+function UILib:CreateToggle(tab, name, default, callback)
+    local ToggleFrame = Instance.new("Frame")
+    ToggleFrame.Size = UDim2.new(1, 0, 0, 40)
+    ToggleFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+    ToggleFrame.BorderSizePixel = 0
+    ToggleFrame.Parent = tab.Content
+    addCorner(ToggleFrame, 8)
+    
+    local Label = Instance.new("TextLabel")
+    Label.Size = UDim2.new(1, -60, 1, 0)
+    Label.Position = UDim2.new(0, 15, 0, 0)
+    Label.BackgroundTransparency = 1
+    Label.Text = name
+    Label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Label.TextSize = 13
+    Label.Font = Enum.Font.Gotham
+    Label.TextXAlignment = Enum.TextXAlignment.Left
+    Label.Parent = ToggleFrame
+    
+    local ToggleButton = Instance.new("TextButton")
+    ToggleButton.Size = UDim2.new(0, 45, 0, 24)
+    ToggleButton.Position = UDim2.new(1, -55, 0.5, -12)
+    ToggleButton.BackgroundColor3 = default and Color3.fromRGB(60, 180, 80) or Color3.fromRGB(60, 60, 70)
+    ToggleButton.Text = ""
+    ToggleButton.BorderSizePixel = 0
+    ToggleButton.Parent = ToggleFrame
+    addCorner(ToggleButton, 12)
+    
+    local Circle = Instance.new("Frame")
+    Circle.Size = UDim2.new(0, 18, 0, 18)
+    Circle.Position = default and UDim2.new(1, -21, 0.5, -9) or UDim2.new(0, 3, 0.5, -9)
+    Circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    Circle.BorderSizePixel = 0
+    Circle.Parent = ToggleButton
+    addCorner(Circle, 9)
+    
+    local enabled = default
+    
+    ToggleButton.MouseButton1Click:Connect(function()
+        enabled = not enabled
+        
+        tween(ToggleButton, {
+            BackgroundColor3 = enabled and Color3.fromRGB(60, 180, 80) or Color3.fromRGB(60, 60, 70)
+        }, 0.3)
+        
+        tween(Circle, {
+            Position = enabled and UDim2.new(1, -21, 0.5, -9) or UDim2.new(0, 3, 0.5, -9)
+        }, 0.3)
+        
+        pcall(callback, enabled)
+    end)
+    
+    return ToggleFrame
+end
 
---[[
-    USAGE INSTRUCTIONS:
+-- ═══ CREATE BUTTON ═══
+function UILib:CreateButton(tab, text, callback)
+    local Button = Instance.new("TextButton")
+    Button.Size = UDim2.new(1, 0, 0, 40)
+    Button.BackgroundColor3 = Color3.fromRGB(50, 50, 65)
+    Button.BorderSizePixel = 0
+    Button.Text = text
+    Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Button.TextSize = 13
+    Button.Font = Enum.Font.GothamBold
+    Button.Parent = tab.Content
+    addCorner(Button, 8)
     
-    1. Load the library using loadstring or require
-    2. Create a window with Library:CreateWindow()
-    3. Create tabs with Window:CreateTab()
-    4. Add elements to tabs using Tab:AddElement()
-    5. Save/Load configs with Window:SaveConfig() and Window:LoadConfig()
+    Button.MouseEnter:Connect(function()
+        tween(Button, {BackgroundColor3 = Color3.fromRGB(70, 70, 85)}, 0.2)
+    end)
+    Button.MouseLeave:Connect(function()
+        tween(Button, {BackgroundColor3 = Color3.fromRGB(50, 50, 65)}, 0.2)
+    end)
     
-    AVAILABLE ELEMENTS:
-    - AddLabel(text)
-    - AddButton(config)
-    - AddToggle(config)
-    - AddSlider(config)
-    - AddDropdown(config)
-    - AddMultiDropdown(config)
-    - AddTextBox(config)
-    - AddColorPicker(config)
+    Button.MouseButton1Click:Connect(function()
+        tween(Button, {BackgroundColor3 = Color3.fromRGB(40, 40, 55)}, 0.1)
+        task.wait(0.1)
+        tween(Button, {BackgroundColor3 = Color3.fromRGB(70, 70, 85)}, 0.1)
+        pcall(callback)
+    end)
     
-    CONFIG STRUCTURE:
-    {
-        Name = "Element Name",
-        Text = "Element Text", -- Alternative to Name
-        Default = value,
-        Min = number, -- For sliders
-        Max = number, -- For sliders
-        Increment = number, -- For sliders
-        Options = {}, -- For dropdowns
-        Placeholder = "text", -- For textboxes
-        Flag = "FlagName", -- For saving/loading
-        Callback = function(value) end
-    }
+    return Button
+end
+
+-- ═══ CREATE DIVIDER ═══
+function UILib:CreateDivider(tab)
+    local Divider = Instance.new("Frame")
+    Divider.Size = UDim2.new(1, -20, 0, 1)
+    Divider.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
+    Divider.BorderSizePixel = 0
+    Divider.Parent = tab.Content
     
-    PROGRAMMATIC CONTROL:
-    local element = Tab:AddElement(config)
-    element:Set(value) -- Change value programmatically
-    element:Refresh(newOptions) -- For dropdowns only
-    
-    WINDOW FUNCTIONS:
-    Window:SaveConfig(name) -- Save current configuration
-    Window:LoadConfig(name) -- Load saved configuration
-    Window.Flags -- Access all flag values
-    Window.MinimizeButton -- Access minimize button
-    
-    TIPS:
-    - Use flags for elements you want to save/load
-    - Callbacks are called when element values change
-    - The UI automatically handles minimize/maximize
-    - Config files are saved in the ConfigFolder
-    - All colors can be customized in CreateWindow
-    
-    CUSTOMIZATION:
-    ThemePrimary = Main background color
-    ThemeSecondary = Secondary elements color
-    ThemeAccent = Accent/highlight color
-    ConfigFolder = Folder name for saving configs
-]]
+    return Divider
+end
+
+-- ═══ NOTIFICATION ═══
+function UILib:Notify(title, message, duration)
+    task.spawn(function()
+        local Notif = Instance.new("Frame")
+        Notif.Size = UDim2.new(0, 320, 0, 90)
+        Notif.Position = UDim2.new(1, 340, 1, -110)
+        Notif.BackgroundColor3 = Color3.fromRGB(30, 30, 38)
+        Notif.BorderSizePixel = 0
+        Notif.Parent = CoreGui:FindFirstChild("PianHubUI") or CoreGui
+        addCorner(Notif, 10)
+        addStroke(Notif, Color3.fromRGB(80, 80, 100), 2)
+        
+        local NotifTitle = Instance.new("TextLabel")
+        NotifTitle.Size = UDim2.new(1, -20, 0, 28)
+        NotifTitle.Position = UDim2.new(0, 10, 0, 8)
+        NotifTitle.BackgroundTransparency = 1
+        NotifTitle.Text = title
+        NotifTitle.TextColor3 = Color3.fromRGB(150, 200, 255)
+        NotifTitle.TextSize = 14
+        NotifTitle.Font = Enum.Font.GothamBold
+        NotifTitle.TextXAlignment = Enum.TextXAlignment.Left
+        NotifTitle.Parent = Notif
+        
+        local NotifMessage = Instance.new("TextLabel")
+        NotifMessage.Size = UDim2.new(1, -20, 1, -40)
+        NotifMessage.Position = UDim2.new(0, 10, 0, 35)
+        NotifMessage.BackgroundTransparency = 1
+        NotifMessage.Text = message
+        NotifMessage.TextColor3 = Color3.fromRGB(200, 200, 210)
+        NotifMessage.TextSize = 12
+        NotifMessage.Font = Enum.Font.Gotham
+        NotifMessage.TextXAlignment = Enum.TextXAlignment.Left
+        NotifMessage.TextYAlignment = Enum.TextYAlignment.Top
+        NotifMessage.TextWrapped = true
+        NotifMessage.Parent = Notif
+        
+        -- Slide in
+        tween(Notif, {Position = UDim2.new(1, -340, 1, -110)}, 0.5)
+        
+        task.wait(duration or 4)
+        
+        -- Slide out
+        tween(Notif, {Position = UDim2.new(1, 340, 1, -110)}, 0.5)
+        task.wait(0.5)
+        Notif:Destroy()
+    end)
+end
+
+return UILib

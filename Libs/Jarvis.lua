@@ -10,7 +10,9 @@ ThemeManager.Themes = {
         BackgroundColor = Color3.fromRGB(25, 25, 25),
         ElementColor = Color3.fromRGB(33, 33, 33),
         TextColor = Color3.fromRGB(255, 255, 255),
-        TextSecondaryColor = Color3.fromRGB(198, 198, 198)
+        TextSecondaryColor = Color3.fromRGB(198, 198, 198),
+        TabSelectedColor = Color3.fromRGB(139, 0, 23),
+        DropdownOptionColor = Color3.fromRGB(118, 0, 20)
     },
     Ocean = {
         MainColor = Color3.fromRGB(0, 119, 182),
@@ -19,7 +21,9 @@ ThemeManager.Themes = {
         BackgroundColor = Color3.fromRGB(25, 25, 25),
         ElementColor = Color3.fromRGB(33, 33, 33),
         TextColor = Color3.fromRGB(255, 255, 255),
-        TextSecondaryColor = Color3.fromRGB(198, 198, 198)
+        TextSecondaryColor = Color3.fromRGB(198, 198, 198),
+        TabSelectedColor = Color3.fromRGB(0, 119, 182),
+        DropdownOptionColor = Color3.fromRGB(0, 96, 150)
     },
     Forest = {
         MainColor = Color3.fromRGB(46, 125, 50),
@@ -28,7 +32,9 @@ ThemeManager.Themes = {
         BackgroundColor = Color3.fromRGB(25, 25, 25),
         ElementColor = Color3.fromRGB(33, 33, 33),
         TextColor = Color3.fromRGB(255, 255, 255),
-        TextSecondaryColor = Color3.fromRGB(198, 198, 198)
+        TextSecondaryColor = Color3.fromRGB(198, 198, 198),
+        TabSelectedColor = Color3.fromRGB(46, 125, 50),
+        DropdownOptionColor = Color3.fromRGB(35, 100, 40)
     },
     Purple = {
         MainColor = Color3.fromRGB(106, 27, 154),
@@ -37,11 +43,14 @@ ThemeManager.Themes = {
         BackgroundColor = Color3.fromRGB(25, 25, 25),
         ElementColor = Color3.fromRGB(33, 33, 33),
         TextColor = Color3.fromRGB(255, 255, 255),
-        TextSecondaryColor = Color3.fromRGB(198, 198, 198)
+        TextSecondaryColor = Color3.fromRGB(198, 198, 198),
+        TabSelectedColor = Color3.fromRGB(106, 27, 154),
+        DropdownOptionColor = Color3.fromRGB(85, 20, 125)
     }
 }
 
 ThemeManager.CurrentTheme = "Default"
+ThemeManager.ThemeElements = {}
 
 function ThemeManager:GetTheme(themeName)
     return self.Themes[themeName] or self.Themes.Default
@@ -51,23 +60,62 @@ function ThemeManager:ApplyTheme(themeName, elements)
     local theme = self:GetTheme(themeName)
     self.CurrentTheme = themeName
     
+    -- Apply to main frame
     if elements.MainWhiteFrame then
         elements.MainWhiteFrame.BackgroundColor3 = theme.MainColor
     end
+    
+    -- Apply to header
     if elements.header then
         elements.header.BackgroundColor3 = theme.SecondaryColor
     end
+    
+    -- Apply to minimize icon
     if elements.minimizeIcon then
         elements.minimizeIcon.BackgroundColor3 = theme.SecondaryColor
     end
     
-    for _, element in pairs(elements.themeElements or {}) do
-        if element:IsA("Frame") or element:IsA("TextButton") then
-            if element.Name:find("Main") or element.Name:find("Inner") then
-                element.BackgroundColor3 = theme.SecondaryColor
+    -- Apply to scrollbar
+    if elements.scrollbarColor then
+        for _, page in pairs(elements.scrollbarColor:GetChildren()) do
+            if page:IsA("ScrollingFrame") then
+                page.ScrollBarImageColor3 = theme.AccentColor
             end
         end
     end
+    
+    -- Apply to all theme elements
+    for _, element in pairs(self.ThemeElements) do
+        if element and element.Parent then
+            if element:IsA("Frame") or element:IsA("TextButton") then
+                element.BackgroundColor3 = theme.SecondaryColor
+            elseif element:IsA("ImageButton") then
+                element.ImageColor3 = theme.SecondaryColor
+            end
+        end
+    end
+    
+    -- Apply to tab buttons
+    if elements.tabFrame then
+        for _, child in pairs(elements.tabFrame:GetChildren()) do
+            if child:IsA("TextButton") and child.BackgroundColor3 == Color3.fromRGB(139, 0, 23) then
+                child.BackgroundColor3 = theme.TabSelectedColor
+            end
+        end
+    end
+    
+    -- Apply to dropdown options
+    if elements.dropdownOptions then
+        for _, dropdown in pairs(elements.dropdownOptions) do
+            if dropdown and dropdown.Parent then
+                dropdown.BackgroundColor3 = theme.DropdownOptionColor
+            end
+        end
+    end
+end
+
+function ThemeManager:RegisterElement(element)
+    table.insert(self.ThemeElements, element)
 end
 
 -- Save Manager

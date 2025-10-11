@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════════
--- 🎨 PIAN HUB UI Library v2.0
+-- 🎨 PIAN HUB UI Library v2.0 (FIXED)
 -- Modern & Clean UI Components
 -- ═══════════════════════════════════════════════════════
 
@@ -289,9 +289,21 @@ function UILib:CreateTab(window, name, icon)
     
     window.Tabs[name] = tab
     
-    -- Auto select first tab
+    -- FIXED: Auto select first tab - gunakan task.spawn untuk delay
     if not window.CurrentTab then
-        TabButton.MouseButton1Click:Fire()
+        task.spawn(function()
+            task.wait(0.1)
+            -- Manually trigger the tab selection
+            for _, t in pairs(window.Tabs) do
+                t.Content.Visible = false
+                t.Button.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+                t.Button.TextColor3 = Color3.fromRGB(180, 180, 190)
+            end
+            ContentFrame.Visible = true
+            TabButton.BackgroundColor3 = Color3.fromRGB(60, 60, 75)
+            TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+            window.CurrentTab = tab
+        end)
     end
     
     return tab

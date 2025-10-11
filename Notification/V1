@@ -53,7 +53,7 @@ local function Notify(settings)
 		titleLabel.Position = UDim2.new(0, 10, 0, 5)
 		titleLabel.BackgroundTransparency = 1
 		titleLabel.Text = title
-		titleLabel.TextColor3 = Color3.fromRGB(255, 200, 50)
+		titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 		titleLabel.TextSize = 14
 		titleLabel.Font = Enum.Font.GothamBold
 		titleLabel.TextXAlignment = Enum.TextXAlignment.Left
